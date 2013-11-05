@@ -1,6 +1,6 @@
 <html>
 <head>
-	<link rel="stylesheet" type="text/css" href="http://marr.southern.edu/forms/assets/snippets/fitnessPlan/main.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/main.css" media="screen" />
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.core.js"></script>
 	<script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.fade.js"></script>
@@ -53,14 +53,14 @@
 			//page navs
 			$('.next,.prev').on('click',function(){ 
 				//if on "p2", ensure user has created/loaded a profile, else instruct user
-				if(($(this).parent().parent().attr("id")) == "p2"){
+				if(($(this).parent().parent().attr("id")) == "p1"){
 					if(isLoaded == true){
 						checkAssess();
 					}else {
 						alert("You must create or load a profile!");
 					}
-				}else if(($(this).parent().parent().attr("id")) == "p4"){
-					//if on p4, check for all inputs before submitting to database
+				}else if(($(this).parent().parent().attr("id")) == "p3"){
+					//if on p3, check for all inputs before submitting to database
 					if($("#benchPress").val() !="" && $("#militaryPress").val() !="" && $("#squats").val() !="" && $("#deadlifts").val() !="" && $("#romanianDeadlifts").val() !=""){
 						submitAssessment($("#benchPress").val(), $("#militaryPress").val(), $("#squats").val(), $("#deadlifts").val(), $("#romanianDeadlifts").val());
 						go($(this));
@@ -192,7 +192,7 @@
 
 		});
 
-		//check for assessment
+		//check for assessment, and add previously entered data
 		function checkAssess(){
 					var dataObject = {
 					'type' : "checkAssess",
@@ -201,18 +201,19 @@
 
 				$.ajax({
 					type: "POST",
-				     url: "assets/snippets/fitnessPlan/char.modify.php",
+				     url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 				     data: dataObject,
 				     dataType: 'json',
 				     success: function(ndata) {
 				     	console.log("Data: " + ndata);
-				     	console.log(ndata.Assessment)
-				     	$.each(ndata.Entries, function (){
-							console.log(this.id + " " + this.date);
-						});
 
-				     	//if ndata is 1, user has already done assessment, and needs to skip it.
-				     	if(ndata.Assessment) {
+				     	/*$.each(ndata.Entries, function (){
+							console.log(this.id + " " + this.date);
+						});*/
+
+				     	//if ndata.Assessment is NOT empty, user has already done assessment, and needs to skip it.
+				     	if(!jQuery.isEmptyObject(ndata.Assessment)) {
+				     		console.log("fired");
 							//populate self assessment data
 							var substr = ndata.Assessment.AssessmentData.split(',');
 							$("#benchPress").val(substr[0]);
@@ -222,19 +223,19 @@
 							$("#romanianDeadlifts").val(substr[4]);
 
 							//populate monthly data
-							//console.log("test");
+							//TODO: add logic
 
 							//navigate to correct month
 							//TODO: add logic to locate which month to nav to
 							//
-							$('#p2').hide('fade', 700, function(){
-								$('#p5').show('fade', 700, function(){
+							$('#p1').hide('fade', 700, function(){
+								$('#p4').show('fade', 700, function(){
 								});
 							});
 
 						} else {
-							$('#p2').hide('fade', 700, function(){
-								$('#p3').show('fade', 700, function(){
+							$('#p1').hide('fade', 700, function(){
+								$('#p2').show('fade', 700, function(){
 								});
 							});
 						}
@@ -263,7 +264,7 @@
 
 			$.ajax({
 			type: "POST",
-			     url: "assets/snippets/fitnessPlan/char.modify.php",
+			     url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 			     data: dataObject,
 			     success: function(ndata) {
 			     	console.log("charID: " + ndata);
@@ -297,7 +298,7 @@
 
 		$.ajax({
 			type: "POST",
-		    url: "assets/snippets/fitnessPlan/char.modify.php",
+		    url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 		    data: dataObject,
 		    dataType: 'json',
 		    success: function(ldata) {
@@ -335,7 +336,7 @@
 
 		$.ajax({
 			type: "POST",
-		    url: "assets/snippets/fitnessPlan/char.modify.php",
+		    url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 		    data: dataObject,
 		    success: function(ldata) {
 		     	console.log(ldata);
@@ -398,12 +399,9 @@
 					$('#header').html("Southern's fitness plan simulator");
 					break;
 				case 2:
-					$('#header').html("profile Selection");
-					break;
-				case 3:
 					$('#header').html("Plan Overview");
 					break;
-				case 4:
+				case 3:
 					$('#header').html("Personal Assessment");
 					break;
 				default:
@@ -427,15 +425,10 @@
 		In this simulation you are about to embark on, you will choose an activity or sport and will be assigned a goal related to your selection. You will then create a fitness plan that will aide you in meeting your goal in three 
 		months.</p>
 
-	<div id="buttons"><a href="#" class="pButton green next">Next ></a></div>
-	</div>
-
-	<div id="p2" style="display:none;">
 		<div id="charLoad"><!--load reponse placed here on successful ajax post--></div>
 		<p style="text-align:center;">
 
-			<a id="newChar" href="#" class="pButton green">New Profile</a><br /><br />
-			<a id="loadChar" href="#" class="pButton green">Load Profile</a><br /><br />
+			<a id="newChar" href="#" class="pButton green">New Profile</a>&nbsp;&nbsp;&nbsp;<a id="loadChar" href="#" class="pButton green">Load Profile</a><br /><br />
 		</p>
 
 		<div id="newDialog" title="Create a new Profile">
@@ -460,11 +453,10 @@
 			<div id="loadDialog" title="Load a profile">
 			</div>
 
-
-		<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
+	<div id="buttons" class="sel"><a href="#" class="pButton green next">Next ></a></div>
 	</div>
 
-	<div id="p3" style="display:none;">
+	<div id="p2" style="display:none;">
 		<!--Basketball Outline-->
 		<div id="Basketball" style="display:none;">
 			<b>Goal:</b> Be able to Dunk<br /><br />
@@ -551,10 +543,10 @@
 		</div>
 
 
-	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
+	<div id="buttons"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
 	</div>
 
-	<div id="p4" style="display:none;">
+	<div id="p3" style="display:none;">
 		
 		<strong><u>Step one</u></strong>: Go to the gym and work to find a weight where you can only do five consecutive reps, 
 		where the fifth is a struggle to complete. Once you have found these values, enter them in the table below. <br /><br />
@@ -625,13 +617,12 @@
 
 			<span style="font-size: 8px;"><center>Hover over question marks for tips, or click to view more information!</center></span>
 
-	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
+	<div id="buttons"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
 	</div>
 
-	<div id="p5" style="display:none;">
+	<div id="p4" style="display:none;">
 		
-		<strong><u>Step one</u></strong>: Go to the gym and work to find a weight where you can only do five consecutive reps, 
-		where the fifth is a struggle to complete. Once you have found these values, enter them in the table below. <br /><br />
+		<strong><u>Step two</u></strong>: XXXXXXXXXXXX <br /><br />
 
 		
 

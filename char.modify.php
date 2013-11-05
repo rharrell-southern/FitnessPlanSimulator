@@ -183,17 +183,18 @@ if($_POST["type"] == "new"){
 	//define table
 	$table = "fp_users";
 	$table2 = "fp_data";
+	$output;
 
 	$res = $modx->db->query('SELECT * FROM '.$table.' WHERE ID = \''. $_POST["charID"].'\'');
 	$row = $modx->db->getRow( $res );
 
+	if ($row['personalAssessment'] != ""){
 	$output = '{"Assessment":{"AssessmentData":"'.$row["personalAssessment"].'"}, "Entries" : {';
 
 	$res2 = $modx->db->query('SELECT * FROM '.$table2.' WHERE ID = \''. $_POST["charID"].'\'');
 	$totalRecords = $modx->db->getRecordCount( $res2 );
 
 	$output;
-	if ($row['personalAssessment'] != ""){
 		if($totalRecords >= 1)
 	   {
 	   		
@@ -208,9 +209,13 @@ if($_POST["type"] == "new"){
 
 				$i++;
 			}
+			$output .= '}}';
+	   } else{
+	   	$output .= '}}';
 	   }
+	}else{
+		$output = '{}';
 	}
-	$output .= '}}';
 	echo($output);
 }else if($_POST["type"] == "submitAssess"){
 	//define table
