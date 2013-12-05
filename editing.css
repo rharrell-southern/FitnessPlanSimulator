@@ -37,37 +37,22 @@ body{
 
 }
 
-.personalAssessmentInput, .dateExInput{
-    width: 40px;
+.personalAssessmentInput{
+    width: 30px;
 }
-
 
 #personalAssessment{
     margin: 0px auto;
     border: 1px dotted black;
 }
 
- #dateExCreation{
-    border: 1px dotted black;
-}
-
-#personalAssessment th, #dateExCreation th{
+#personalAssessment th{
     color:#FFF;
     background-color:#333;
     border-bottom: 1px dotted #000 !important;
 }
 
-#personalAssessment th, #dateExCreation th{
-    color:#FFF;
-    background-color:#333;
-    border-bottom: 1px dotted #000 !important;
-}
-
-#personalAssessment tbody tr:nth-child(even){
-    background-color: #EEE;
-}
-
-#dateExCreation tbody tr:nth-child(even){
+#personalAssessment tbody tr:nth-child(even) {
     background-color: #EEE;
 }
 

@@ -7,6 +7,13 @@
   	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
   	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
+  	<script type='text/javascript' src="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/fullcalendar-1.6.4/fullcalendar/fullcalendar.js"></script>
+  	<link rel="stylesheet" href="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/fullcalendar-1.6.4/fullcalendar/fullcalendar.css" />
+
+
+  	<script type='text/javascript' src="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/timepicker/jquery.timepicker.js"></script>
+  	<link rel="stylesheet" href="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/timepicker/jquery.timepicker.css" />
+  	<script type='text/javascript' src="http://marr.southern.edu/forms/assets/snippets/fitnessPlanSimulator/timepicker/lib/base.js"></script>
 	<title>Southern Adventist University: Fitness Plan Simulator</title>
 	<script type="text/javascript">
 
@@ -15,7 +22,7 @@
 		var isLoaded = false;
 		var charID = -1;
 		var activity = "";
-
+		var dateSelect = new Date();
 
 		$(function() {
 			//Get username from url var
@@ -26,6 +33,19 @@
 				}
 				console.log("Username: " + username);
 			};
+
+			$('#startTime').timepicker({
+			    'timeFormat': 'H:i'
+			});
+			$('#endTime').timepicker({
+			    'timeFormat': 'H:i'
+			});
+			$('#EstartTime').timepicker({
+			    'timeFormat': 'H:i'
+			});
+			$('#EendTime').timepicker({
+			    'timeFormat': 'H:i'
+			});
 
 			$( document ).tooltip();
 
@@ -72,11 +92,219 @@
 					}
 			});
 
+			//modal for caldate click
+			$( "#dateDialog" ).dialog({
+				autoOpen: false,
+		      	height: 470,
+		      	width: 450,
+		      	position: {
+                        my: "center center", 
+                        at: "center center",
+                        of: window
+                    },
+                buttons: {
+		        "Create": function() {
+		        	//on Create
+		        	dateSelect += "";
+		        	var pieces= dateSelect.split(" ");
+		        	var month = "";
+		        	if(pieces[1] == "Jan"){
+		        		month = 0;
+		        	}else if(pieces[1] == "Feb"){
+		        		month = 1;
+		        	}else if(pieces[1] == "Mar"){
+		        		month = 2;
+		        	}else if(pieces[1] == "Apr"){
+		        		month = 3;
+		        	}else if(pieces[1] == "May"){
+		        		month = 4;
+		        	}else if(pieces[1] == "Jun"){
+		        		month = 5;
+		        	}else if(pieces[1] == "Jul"){
+		        		month = 6;
+		        	}else if(pieces[1] == "Aug"){
+		        		month = 7;
+		        	}else if(pieces[1] == "Sep"){
+		        		month = 8;
+		        	}else if(pieces[1] == "Oct"){
+		        		month = 9;	
+		        	}else if(pieces[1] == "Nov"){
+		        		month = 10;
+		        	}else if(pieces[1] == "Dec"){
+		        		month = 11;
+		        	}
+
+		        	var timeS = $("#startTime").val().split(":");
+		        	var timeE = $("#endTime").val().split(":");
+
+
+				    var daySource = new Object();
+				    daySource.id = (($("#calendar").fullCalendar( 'clientEvents' ).length) + parseInt("1"));
+				    daySource.title = 'Routine';
+				    daySource.start = new Date(pieces[3], month, pieces[2], timeS[0], timeS[1], "00", "00");
+				    daySource.end = new Date(pieces[3], month, pieces[2], timeE[0], timeE[1], "00", "00");
+				    daySource.allDay = false;
+				    daySource.description = $("#dateBenchPressWeight").val() + "," + $("#dateBenchPressReps").val() + "," + $("#dateBenchPressSets").val() + "," + $("#dateMilitaryPressWeight").val() + "," + $("#dateMilitaryPressReps").val() + "," + 
+				    	$("#dateMilitaryPressSets").val() + "," + $("#dateSquatsWeight").val() + "," + $("#dateSquatsReps").val() + "," + $("#dateSquatsSets").val() + "," + $("#dateDeadliftsWeight").val() + "," + $("#dateDeadliftsReps").val() + "," + $("#dateDeadliftsSets").val() + "," + 
+				    	$("#dateRomanianDeadliftsWeight").val() + "," + $("#dateRomanianDeadliftsReps").val() + "," + $("#dateRomanianDeadliftsSets").val();
+
+				    var day = new Array();
+				    day[0] = daySource;
+
+				    if($("#startTime").val() == "" || $("#endTime").val() == "" || $("#dateBenchPressWeight").val() == "" || $("#dateBenchPressReps").val() == "" || $("#dateBenchPressSets").val() == "" || $("#dateMilitaryPressWeight").val() == "" || $("#dateMilitaryPressReps").val() == "" || 
+				    	$("#dateMilitaryPressSets").val() == "" || $("#dateSquatsWeight").val() == "" || $("#dateSquatsReps").val() == "" || $("#dateSquatsSets").val() == "" || $("#dateDeadliftsWeight").val() == "" || $("#dateDeadliftsReps").val() == "" || $("#dateDeadliftsSets").val() == "" || 
+				    	$("#dateRomanianDeadliftsWeight").val() == "" || $("#dateRomanianDeadliftsReps").val() == "" || $("#dateRomanianDeadliftsSets").val() == ""){
+				    	alert("All fields must be filled out!");
+				    }else{
+				    	$("#calendar").fullCalendar('addEventSource', day);
+	    				$('#calendar').fullCalendar('rerenderEvents');
+
+	    				var source = $("#calendar").fullCalendar( 'clientEvents' );
+
+	    				submitSource(source);
+
+	    				$("#startTime").val("");
+	    				$("#endTime").val("");
+	    				$("#dateBenchPressWeight").val("");
+	    				$("#dateBenchPressReps").val("");
+	    				$("#dateBenchPressSets").val("");
+	    				$("#dateMilitaryPressWeight").val("");
+	    				$("#dateMilitaryPressReps").val("");
+				    	$("#dateMilitaryPressSets").val("");
+	    				$("#dateSquatsWeight").val("");
+	    				$("#dateSquatsReps").val("");
+	    				$("#dateSquatsSets").val("");
+	    				$("#dateDeadliftsWeight").val("");
+	    				$("#dateDeadliftsReps").val("");
+	    				$("#dateDeadliftsSets").val("");
+				    	$("#dateRomanianDeadliftsWeight").val("");
+	    				$("#dateRomanianDeadliftsReps").val("");
+	    				$("#dateRomanianDeadliftsSets").val("");
+
+			          	$( this ).dialog( "close" );
+				    }
+		        },
+		        Cancel: function() {
+		        	//On cancel: 
+		          	$( this ).dialog( "close" );
+		        },
+		      },
+      			modal: true
+		    });
+
+			//modal for on calevent click
+		    $( "#eventDialog" ).dialog({
+				autoOpen: false,
+		      	height: 470,
+		      	width: 450,
+		      	position: {
+                        my: "center center", 
+                        at: "center center",
+                        of: window
+                    },
+                buttons: {
+		        "Save": function() {
+				    date = dateEvent.start + "";
+				    var pieces = date.split(" ");
+
+				    var month = "";
+		        	if(pieces[1] == "Jan"){
+		        		month = 0;
+		        	}else if(pieces[1] == "Feb"){
+		        		month = 1;
+		        	}else if(pieces[1] == "Mar"){
+		        		month = 2;
+		        	}else if(pieces[1] == "Apr"){
+		        		month = 3;
+		        	}else if(pieces[1] == "May"){
+		        		month = 4;
+		        	}else if(pieces[1] == "Jun"){
+		        		month = 5;
+		        	}else if(pieces[1] == "Jul"){
+		        		month = 6;
+		        	}else if(pieces[1] == "Aug"){
+		        		month = 7;
+		        	}else if(pieces[1] == "Sep"){
+		        		month = 8;
+		        	}else if(pieces[1] == "Oct"){
+		        		month = 9;	
+		        	}else if(pieces[1] == "Nov"){
+		        		month = 10;
+		        	}else if(pieces[1] == "Dec"){
+		        		month = 11;
+		        	}
+
+		        	var timeS = $("#EstartTime").val().split(":");
+		        	var timeE = $("#EendTime").val().split(":");
+
+				    dateEvent.start = new Date(pieces[3], month, pieces[2], timeS[0], timeS[1], "00", "00");
+				    dateEvent.end = new Date(pieces[3], month, pieces[2], timeE[0], timeE[1], "00", "00");
+
+
+
+				    dateEvent.description = $("#EdateBenchPressWeight").val() + "," + $("#EdateBenchPressReps").val() + "," + $("#EdateBenchPressSets").val() + "," + $("#EdateMilitaryPressWeight").val() + "," + $("#EdateMilitaryPressReps").val() + "," + 
+				    	$("#EdateMilitaryPressSets").val() + "," + $("#EdateSquatsWeight").val() + "," + $("#EdateSquatsReps").val() + "," + $("#EdateSquatsSets").val() + "," + $("#EdateDeadliftsWeight").val() + "," + $("#EdateDeadliftsReps").val() + "," + $("#EdateDeadliftsSets").val() + "," + 
+				    	$("#EdateRomanianDeadliftsWeight").val() + "," + $("#EdateRomanianDeadliftsReps").val() + "," + $("#EdateRomanianDeadliftsSets").val();
+
+
+				    if($("#EstartTime").val() == "" || $("#EendTime").val() == "" || $("#EdateBenchPressWeight").val() == "" || $("#EdateBenchPressReps").val() == "" || $("#EdateBenchPressSets").val() == "" || $("#EdateMilitaryPressWeight").val() == "" || $("#EdateMilitaryPressReps").val() == "" || 
+				    	$("#EdateMilitaryPressSets").val() == "" || $("#EdateSquatsWeight").val() == "" || $("#EdateSquatsReps").val() == "" || $("#EdateSquatsSets").val() == "" || $("#EdateDeadliftsWeight").val() == "" || $("#EdateDeadliftsReps").val() == "" || $("#EdateDeadliftsSets").val() == "" || 
+				    	$("#EdateRomanianDeadliftsWeight").val() == "" || $("#EdateRomanianDeadliftsReps").val() == "" || $("#EdateRomanianDeadliftsSets").val() == ""){
+				    	alert("All fields must be filled out!");
+				    }else{
+	    				$('#calendar').fullCalendar('rerenderEvents');
+
+	    				var source = $("#calendar").fullCalendar( 'clientEvents' );
+
+	    				submitSource(source);
+
+	    				$("#EstartTime").val("");
+	    				$("#EendTime").val("");
+	    				$("#EdateBenchPressWeight").val("");
+	    				$("#EdateBenchPressReps").val("");
+	    				$("#EdateBenchPressSets").val("");
+	    				$("#EdateMilitaryPressWeight").val("");
+	    				$("#EdateMilitaryPressReps").val("");
+				    	$("#EdateMilitaryPressSets").val("");
+	    				$("#EdateSquatsWeight").val("");
+	    				$("#EdateSquatsReps").val("");
+	    				$("#EdateSquatsSets").val("");
+	    				$("#EdateDeadliftsWeight").val("");
+	    				$("#EdateDeadliftsReps").val("");
+	    				$("#EdateDeadliftsSets").val("");
+				    	$("#EdateRomanianDeadliftsWeight").val("");
+	    				$("#EdateRomanianDeadliftsReps").val("");
+	    				$("#EdateRomanianDeadliftsSets").val("");
+
+
+			          	$( this ).dialog( "close" );
+			          }
+
+		        },
+		        "Delete": function() {
+
+				    $('#calendar').fullCalendar('removeEvents', dateEvent.id)
+    				
+				    var source = $("#calendar").fullCalendar( 'clientEvents' );
+
+    				submitSource(source);
+
+		          	$( this ).dialog( "close" );
+		        },
+		        Cancel: function() {
+		        	//On cancel: 
+		          	$( this ).dialog( "close" );
+		        },
+		      },
+      			modal: true
+		    });
+
 
 			//On selection of "New profile" on div id="p2"
 		    $( "#newChar" ).on('click',function() {
 		      $( "#newDialog" ).dialog( "open" );
 		    });
+
 
 		    //modal for "New profile" on div id="p2"
 			$( "#newDialog" ).dialog({
@@ -100,8 +328,8 @@
 		        	var gender = $("input[name=gender]:checked", "#selGender").val();
 
 		        	//print selected data
-		        	console.log("Selected activty:" + activity);
-		        	console.log("Selected gender:" + gender);
+		        	//console.log("Selected activty:" + activity);
+		        	//console.log("Selected gender:" + gender);
 
 		        	//ensure user has selected BOTH an activity and gender
 		        	if(activity != "default" && gender != null){
@@ -113,7 +341,7 @@
 		          		$("#"+activity).show();
 
 		          		//print selected data
-		        		console.log("Selected Activity: " + activity);
+		        		//console.log("Selected Activity: " + activity);
 
 
 		      		}else{
@@ -163,12 +391,13 @@
 
 		        	//track selected ID
 		        	charID = $("input[name=character]:checked", "#loadDialog").val();
+		        	//console.log(charID);
 
 		        	//get the activity related to selected charID (which will be the next span of class "act")
 		        	activity = $("input[name=character]:checked", "#loadDialog").nextAll("span.act:first").text();
 		        	//print selected data
-		        	console.log("Selected charID: " + charID);
-		        	console.log("Selected Activity: " + activity);
+		        	//console.log("Selected charID: " + charID);
+		        	//console.log("Selected Activity: " + activity);
 
 		        	//ensure user has selected a profile
 		        	if(charID != null){
@@ -205,7 +434,7 @@
 				     data: dataObject,
 				     dataType: 'json',
 				     success: function(ndata) {
-				     	console.log("Data: " + ndata);
+				     	//console.log("Data: " + ndata);
 
 				     	/*$.each(ndata.Entries, function (){
 							console.log(this.id + " " + this.date);
@@ -213,7 +442,6 @@
 
 				     	//if ndata.Assessment is NOT empty, user has already done assessment, and needs to skip it.
 				     	if(!jQuery.isEmptyObject(ndata.Assessment)) {
-				     		console.log("fired");
 							//populate self assessment data
 							var substr = ndata.Assessment.AssessmentData.split(',');
 							$("#benchPress").val(substr[0]);
@@ -222,14 +450,75 @@
 							$("#deadlifts").val(substr[3]);
 							$("#romanianDeadlifts").val(substr[4]);
 
-							//populate monthly data
-							//TODO: add logic
 
-							//navigate to correct month
-							//TODO: add logic to locate which month to nav to
-							//
 							$('#p1').hide('fade', 700, function(){
 								$('#p4').show('fade', 700, function(){
+
+									$('#calendar').fullCalendar({
+								    	events: {
+									        url: 'assets/snippets/fitnessPlanSimulator/char.modify.php',
+									        type: 'POST',
+									        data: {
+												'type'		: "eventLoad",
+												'UID'		: charID
+									        },
+									        error: function() {
+									            alert('there was an error while fetching events!');
+									        }
+									    },
+								        header: {
+										left: 'prev,next today',
+										center: 'title',
+										right: 'month,basicWeek,basicDay'
+										},
+										editable: false,
+										dayClick: function(date, allDay, jsEvent, view) {
+
+											console.log(date);
+											dateSelect = date;
+									        $( "#dateDialog" ).dialog( "open" );
+
+
+									    },
+									    eventClick: function(event) {
+									    	console.log(event.title);
+									    	dateEvent = event;
+
+									    	Stime = event.start + "";
+									    	Stime = Stime.split(" ");
+
+									    	Etime = event.end + "";
+									    	Etime = Etime.split(" ");
+
+									    	var desc = event.description.split(',');
+
+						    				$("#EstartTime").val(Stime[4]);
+						    				$("#EendTime").val(Etime[4]);
+						    				$("#EdateBenchPressWeight").val(desc[0]);
+						    				$("#EdateBenchPressReps").val(desc[1]);
+						    				$("#EdateBenchPressSets").val(desc[2]);
+						    				$("#EdateMilitaryPressWeight").val(desc[3]);
+						    				$("#EdateMilitaryPressReps").val(desc[4]);
+									    	$("#EdateMilitaryPressSets").val(desc[5]);
+						    				$("#EdateSquatsWeight").val(desc[6]);
+						    				$("#EdateSquatsReps").val(desc[7]);
+						    				$("#EdateSquatsSets").val(desc[8]);
+						    				$("#EdateDeadliftsWeight").val(desc[9]);
+						    				$("#EdateDeadliftsReps").val(desc[10]);
+						    				$("#EdateDeadliftsSets").val(desc[11]);
+									    	$("#EdateRomanianDeadliftsWeight").val(desc[12]);
+						    				$("#EdateRomanianDeadliftsReps").val(desc[13]);
+						    				$("#EdateRomanianDeadliftsSets").val(desc[14]);
+
+											$( "#eventDialog" ).dialog( "open" );
+										}
+
+								    });
+
+
+									$('#calendar').fullCalendar('render');
+
+
 								});
 							});
 
@@ -348,11 +637,63 @@
 		     	console.log("xhr.statusText: " + xhr.statusText);
 		     	console.log("textStatus: " + textStatus);
 		     	console.log("error: " + error);
-		     	isLoaded = false;
 		    }
 		});
 	}
-		
+
+	function submitSource(source){
+		var sourceObj = [];
+		for(i=0;i<source.length;i++) {
+			sourceObj[i] = new Object(); 
+			sourceObj[i].title = source[i].title + "";
+			sourceObj[i].start = source[i].start + "";
+			sourceObj[i].end = source[i].end + "";
+			sourceObj[i].allDay = source[i].allDay + "";
+			sourceObj[i].description = source[i].description + "";
+			sourceObj[i].id = i;
+		}
+
+		console.log("newsrc: V");
+		console.log(sourceObj);
+
+		//remove circular references generated by fullcalendar for some ungodly reason.
+		for(i=0;i<sourceObj.length;i++) {
+
+			delete sourceObj[i].source;
+			delete sourceObj[i].className;
+			
+		}
+		console.log(sourceObj);
+
+		sourceString = JSON.stringify(sourceObj);
+
+		var dataObject = {
+			'type'		: "eventAdd",
+			'UID'		: charID,
+			'source'	: sourceString
+		}
+		console.log(dataObject);
+
+		$.ajax({
+			type: "POST",
+		    url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
+		    data: dataObject,
+		    success: function(ndata) {
+		     	console.log("successfully written");
+		     	$('#calendar').fullCalendar('removeEvents');
+		     	$('#calendar').fullCalendar('refetchEvents');
+	    		$('#calendar').fullCalendar('rerenderEvents');
+		    },
+		    error: function(xhr, textStatus, error){
+		     	//alert user, reset vars, update status div
+		     	alert("error in POST")
+		     	console.log("xhr.statusText: " + xhr.statusText);
+		     	console.log("textStatus: " + textStatus);
+		     	console.log("error: " + error);
+		    }
+		});
+	}
+
 		//get vars from url string
 		var QueryString = function () {
 			// This function is anonymous, is executed immediately and 
@@ -411,7 +752,23 @@
 				});
 		});
 	}
+	function censor(censor) {
+	  return (function() {
+	    var i = 0;
 
+	    return function(key, value) {
+	      if(i !== 0 && typeof(censor) === 'object' && typeof(value) == 'object' && censor == value) 
+	        return '[Circular]'; 
+
+	      if(i >= 29) // seems to be a harded maximum of 30 serialized objects?
+	        return '[Unknown]';
+
+	      ++i; // so we know we aren't using the original object anymore
+
+	      return value;  
+	    }
+	  })(censor);
+	}
 	</script>
 </head>
 <div id="wrapper">
@@ -622,9 +979,175 @@
 
 	<div id="p4" style="display:none;">
 		
-		<strong><u>Step two</u></strong>: XXXXXXXXXXXX <br /><br />
+		<div id='calendar'></div>
 
-		
+		<div id="dateDialog" title="Add Routine">
+
+			Enter Start time: <input id="startTime" type="text" class="dateCreate" autocomplete="off"><br />
+			Enter End time: <input id="endTime" type="text" class="dateCreate" autocomplete="off"><br /><br />
+			<table id="dateExCreation">
+			<tr>
+				<th>Exercise</th>
+				<th>Weight</th>
+				<th>Reps</th>
+				<th>Sets</th>
+			</tr>
+			<tr>
+				<td>
+					<strong>Bench Press&nbsp;</strong><span class="toolTip" id="benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateBenchPressWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateBenchPressReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateBenchPressSets">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<strong>Military Press&nbsp;</strong><span class="toolTip" id="militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateMilitaryPressWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateMilitaryPressReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateMilitaryPressSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Squats&nbsp;</strong><span class="toolTip" id="squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
+						The exercise starts by moving the hips back and bending the knees and hips to lower the torso and accompanying weight, then returning to the upright position.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateSquatsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateSquatsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateSquatsSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Deadlifts&nbsp;</strong><span class="toolTip" id="deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateDeadliftsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateDeadliftsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateDeadliftsSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip" id="romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateRomanianDeadliftsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateRomanianDeadliftsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="dateRomanianDeadliftsSets">
+				</td>
+			</tr>
+		</table>
+		</div>
+		<div id="eventDialog" title="Edit Routine">
+			Enter Start time: <input id="EstartTime" type="text" class="dateCreate" autocomplete="off"><br />
+			Enter End time: <input id="EendTime" type="text" class="dateCreate" autocomplete="off"><br /><br />
+			<table id="dateExCreation">
+			<tr>
+				<th>Exercise</th>
+				<th>Weight</th>
+				<th>Reps</th>
+				<th>Sets</th>
+			</tr>
+			<tr>
+				<td>
+					<strong>Bench Press&nbsp;</strong><span class="toolTip" id="benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateBenchPressWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateBenchPressReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateBenchPressSets">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<strong>Military Press&nbsp;</strong><span class="toolTip" id="militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateMilitaryPressWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateMilitaryPressReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateMilitaryPressSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Squats&nbsp;</strong><span class="toolTip" id="squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
+						The exercise starts by moving the hips back and bending the knees and hips to lower the torso and accompanying weight, then returning to the upright position.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateSquatsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateSquatsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateSquatsSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Deadlifts&nbsp;</strong><span class="toolTip" id="deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateDeadliftsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateDeadliftsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateDeadliftsSets">
+				</td>
+			</tr>		
+			<tr>
+				<td>
+					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip" id="romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateRomanianDeadliftsWeight">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateRomanianDeadliftsReps">
+				</td>
+				<td>
+					<input type="text" class="dateExInput" id="EdateRomanianDeadliftsSets">
+				</td>
+			</tr>
+		</table>
+		</div>
 
 	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
 	</div>

@@ -225,5 +225,27 @@ if($_POST["type"] == "new"){
 		'personalAssessment'	=> $_POST["personalAssessment"],
 	);
 	$modx->db->update($fields, 'fp_users', 'id = "' . $_POST["ID"] . '"');
+}else if($_POST["type"] == "eventAdd"){
+
+	$data = json_decode($_POST["source"]);
+
+	//define table
+	$table = "fp_data";	
+
+	echo($_POST["source"]);
+
+	$fields = array(
+		'PID'	=> $_POST["UID"],
+		'source'=> $_POST["source"],
+	);
+	$modx->db->update($fields, 'fp_data', 'PID = "' . $_POST["UID"] . '"');
+}else if($_POST["type"] == "eventLoad"){
+
+	//define table
+	$table = "fp_data";	
+
+	$res = $modx->db->getValue('SELECT source FROM '.$table.' WHERE PID = ' . $_POST["UID"]);
+	echo ($res);
+
 }
 ?>
