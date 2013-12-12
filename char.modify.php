@@ -238,14 +238,30 @@ if($_POST["type"] == "new"){
 		'PID'	=> $_POST["UID"],
 		'source'=> $_POST["source"],
 	);
-	$modx->db->update($fields, 'fp_data', 'PID = "' . $_POST["UID"] . '"');
+
+	$res = $modx->db->query('SELECT * FROM '.$table.' WHERE PID = \''. $_POST["UID"].'\'');
+	$count = $modx->db->getRecordCount( $res );
+	if($count < 1){
+		$modx->db->insert($fields, 'fp_data');
+	}else{
+		$modx->db->update($fields, 'fp_data', 'PID = "' . $_POST["UID"] . '"');
+	}
+	
 }else if($_POST["type"] == "eventLoad"){
 
 	//define table
 	$table = "fp_data";	
 
-	$res = $modx->db->getValue('SELECT source FROM '.$table.' WHERE PID = ' . $_POST["UID"]);
-	echo ($res);
+	$res = $modx->db->query('SELECT * FROM '.$table.' WHERE PID = \''. $_POST["UID"].'\'');
+	$count = $modx->db->getRecordCount( $res );
+	if($count > 0){
+		$res = $modx->db->getValue('SELECT source FROM '.$table.' WHERE PID = ' . $_POST["UID"]);
+		echo ($res);
+	}
+		
+
+
+
 
 }
 ?>

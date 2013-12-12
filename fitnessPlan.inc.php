@@ -680,6 +680,7 @@
 		    data: dataObject,
 		    success: function(ndata) {
 		     	console.log("successfully written");
+		     	console.log(ndata);
 		     	$('#calendar').fullCalendar('removeEvents');
 		     	$('#calendar').fullCalendar('refetchEvents');
 	    		$('#calendar').fullCalendar('rerenderEvents');
@@ -745,6 +746,9 @@
 				case 3:
 					$('#header').html("Personal Assessment");
 					break;
+				case 4:
+					loadCalendar();
+					break;
 				default:
 					$('#header').html("Southern's fitness plan simulator");
 					break;
@@ -752,6 +756,73 @@
 				});
 		});
 	}
+
+	function loadCalendar(){
+		$('#calendar').fullCalendar({
+    		events: {
+	        url: 'assets/snippets/fitnessPlanSimulator/char.modify.php',
+	        type: 'POST',
+	        data: {
+				'type'		: "eventLoad",
+				'UID'		: charID
+	        },
+	        error: function() {
+	            //alert('there was an error while fetching events!');
+	        }
+	    },
+        header: {
+		left: 'prev,next today',
+		center: 'title',
+		right: 'month,basicWeek,basicDay'
+		},
+		editable: false,
+		dayClick: function(date, allDay, jsEvent, view) {
+
+			console.log(date);
+			dateSelect = date;
+	        $( "#dateDialog" ).dialog( "open" );
+
+
+	    },
+	    eventClick: function(event) {
+	    	console.log(event.title);
+	    	dateEvent = event;
+
+	    	Stime = event.start + "";
+	    	Stime = Stime.split(" ");
+
+	    	Etime = event.end + "";
+	    	Etime = Etime.split(" ");
+
+	    	var desc = event.description.split(',');
+
+			$("#EstartTime").val(Stime[4]);
+			$("#EendTime").val(Etime[4]);
+			$("#EdateBenchPressWeight").val(desc[0]);
+			$("#EdateBenchPressReps").val(desc[1]);
+			$("#EdateBenchPressSets").val(desc[2]);
+			$("#EdateMilitaryPressWeight").val(desc[3]);
+			$("#EdateMilitaryPressReps").val(desc[4]);
+	    	$("#EdateMilitaryPressSets").val(desc[5]);
+			$("#EdateSquatsWeight").val(desc[6]);
+			$("#EdateSquatsReps").val(desc[7]);
+			$("#EdateSquatsSets").val(desc[8]);
+			$("#EdateDeadliftsWeight").val(desc[9]);
+			$("#EdateDeadliftsReps").val(desc[10]);
+			$("#EdateDeadliftsSets").val(desc[11]);
+	    	$("#EdateRomanianDeadliftsWeight").val(desc[12]);
+			$("#EdateRomanianDeadliftsReps").val(desc[13]);
+			$("#EdateRomanianDeadliftsSets").val(desc[14]);
+
+			$( "#eventDialog" ).dialog( "open" );
+		}
+
+    });
+
+
+	$('#calendar').fullCalendar('render');
+	}
+
 	function censor(censor) {
 	  return (function() {
 	    var i = 0;
