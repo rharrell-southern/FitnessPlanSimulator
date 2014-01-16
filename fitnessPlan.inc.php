@@ -49,24 +49,214 @@
 
 			$( document ).tooltip();
 
-			$('#benchTip').on('click',function(){ 
+
+			$('.benchTip').on('click',function(){ 
 				window.open('http://www.bodybuilding.com/exercises/detail/view/name/bench-press-powerlifting');
 			});
 
-			$('#militaryTip').on('click',function(){ 
+			$('.militaryTip').on('click',function(){ 
 				window.open('http://www.bodybuilding.com/exercises/detail/view/name/seated-barbell-military-press');
 			});
 
-			$('#squatTip').on('click',function(){ 
+			$('.squatTip').on('click',function(){ 
 				window.open('http://www.bodybuilding.com/exercises/detail/view/name/barbell-full-squat');
 			});
 
-			$('#deadliftTip').on('click',function(){ 
+			$('.deadliftTip').on('click',function(){ 
 				window.open('http://www.bodybuilding.com/exercises/detail/view/name/barbell-deadlift');
 			});
 
-			$('#romDeadliftTip').on('click',function(){ 
+			$('.romDeadliftTip').on('click',function(){ 
 				window.open('http://www.bodybuilding.com/exercises/detail/view/name/romanian-deadlift');
+			});
+
+
+			//On simulate
+			$('.sim').on('click',function(e){ 
+
+				//prevent jumping to top of page
+				e.preventDefault();
+
+				//Get current and (visible) prev/next months
+				var currMonth = $('#calendar').fullCalendar('getView').start + "";
+				var prevMonth = $('#calendar').fullCalendar('getView').visStart + "";
+				var nextMonth = $('#calendar').fullCalendar('getView').visEnd + "";
+
+				currMonth = currMonth.split(" ");
+				var n =  currMonth[1];
+
+				prevMonth = prevMonth.split(" ");
+				var pn =  prevMonth[1];
+
+				nextMonth = nextMonth.split(" ");
+				var nn =  nextMonth[1];
+
+				var src = $("#calendar").fullCalendar( 'clientEvents' );
+
+				var monthSrc = new Array();
+				var index = 0;
+				for( $i = 0; $i < src.length; $i++){
+					var start = src[$i].start + "";
+					start = start.split(" ");
+
+					//only evaluate events of the visible month +/- 1 week
+					if ( start[1] == n || (start[1] == pn && start[2] >= prevMonth[2]) || (start[1] == nn && start[2] <= nextMonth[2])){
+						monthSrc[index] = src[$i];
+						index++;
+					}
+				}
+
+				//array formed, now perform logic checks
+
+				console.log("new src: ", monthSrc);
+
+				var error = "";
+
+				for($i = 0; $i<monthSrc.length; $i++){
+
+					console.log("------------");
+					console.log("I CYCLE: " + $i);
+					console.log("------------");
+
+						//get our limits (sunday, friday, next friday)
+						console.log("Date: " + monthSrc[$i].start);
+						var initialDate = monthSrc[$i].start;
+						closestPrevSunday = initialDate.getDay();
+						var sundayDate = new Date(initialDate.toISOString());
+						sundayDate.setDate(sundayDate.getDate() - closestPrevSunday);
+
+						var dateOneWeek = new Date(initialDate.toISOString());
+						closestFriday = dateOneWeek.getDay();
+						dateOneWeek.setDate(dateOneWeek.getDate() + (6 - closestFriday));
+
+						var dateTwoWeek = new Date(sundayDate.toISOString());
+						dateTwoWeek.setDate(dateTwoWeek.getDate() + 13);
+
+						var dateTwoWeekS = new Date(sundayDate.toISOString());
+						dateTwoWeekS.setDate(dateTwoWeekS.getDate() + 14);
+
+						
+						console.log("Range: " + sundayDate + " - " + dateOneWeek + " - " + dateTwoWeek);
+						
+						var lastAccepted = 0;
+						var counterW1 = 0;
+						var counterW2 = 0;
+						var lbCountW1 = 0;
+						var lbCountW2 = 0;
+						var ubCountW1 = 0;
+						var ubCountW2 = 0;
+						for($j = 0; $j<monthSrc.length; $j++){
+						
+							var tmpDate = monthSrc[$j].start;
+							//console.log("(J) trying: " + tmpDate);
+
+							//First week
+							if(tmpDate >= sundayDate && tmpDate <= dateOneWeek){
+								counterW1++;
+								lastAccepted = $j;
+								//console.log("ACCEPTED");
+								//console.log("counterW1: " + counterW1);
+								
+								var excer = monthSrc[$j].description.split(",");
+								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
+									lbCountW1++;
+								}
+
+								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
+									ubCountW1++;
+								}	
+							}
+
+							//Next week
+							if(tmpDate > dateOneWeek && tmpDate <= dateTwoWeek){
+								counterW2++;
+								lastAccepted = $j;
+								//console.log("ACCEPTED");
+								//console.log("counterW2: " + counterW2);
+								
+								var excer = monthSrc[$j].description.split(",");
+								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
+									lbCountW2++;
+								}
+								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
+									ubCountW2++;
+								}
+								
+							}
+					}
+
+					console.log("LBW1: " + lbCountW1);
+					console.log("LBW2: " + lbCountW2);
+					console.log("UBW1: " + ubCountW1);
+					console.log("UBW2: " + ubCountW2);
+
+					//make sure 3 workouts per week
+					if(counterW1 > 3){
+
+						if(error.indexOf("Too many workout periods( " + counterW1 + " ) within the week of " + sundayDate + "<br /><br/>") == -1){
+						error += "Too many workout periods( " + counterW1 + " ) within the week of " + sundayDate + "<br /><br/>";
+						console.log(error);
+					}
+						var tmp = monthSrc[lastAccepted].start + "";
+						tmp = tmp.split(" ");
+						var cellDate = tmp[3] + "-" + tmp[1] + "-" + tmp[2];
+						console.log(cellDate);
+					}
+
+					if(counterW2 > 3){
+						if(error.indexOf("Too many workout periods( " + counterW2 + " ) within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
+							error += "Too many workout periods( " + counterW2 + " ) within the week of " + dateTwoWeekS + "<br /><br/>";
+							console.log(error);
+						}
+					}
+
+					//make sure there is not more than two for one or each type
+					if((lbCountW1 > 1 && ubCountW1 > 1) && (lbCountW2 > 1 && ubCountW2 > 1)){
+						if(error.indexOf("Too many upper and lower body days within the week of " + sundayDate + " and " + dateTwoWeekS + "<br /><br/>") == -1){
+							error += "Too many upper and lower body days within the week of " + sundayDate + " and " + dateTwoWeekS + "<br /><br/>";
+						}
+
+					}else if(lbCountW1 > 1 && ubCountW1 > 1){
+						if(error.indexOf("Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
+							error += "Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
+						}
+
+					}else if(lbCountW2 > 1 && ubCountW2 > 1){
+						if(error.indexOf("Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
+							error += "Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>";
+						}
+					}
+
+					if (lbCountW1 > 1 && lbCountW2 > 1){
+						if(error.indexOf("Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
+							error += "Too many lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
+						}
+
+					}else if(ubCountW1 > 1 && ubCountW2 > 1){
+						if(error.indexOf("Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
+							error += "Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
+						}
+					}else if(ubCountW1 <= 1 && ubCountW2 <= 1){
+						if(error.indexOf("Too few upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
+							error += "Too few upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
+						}
+					}else if(lbCountW1 <= 1 && lbCountW2 <= 1){
+						if(error.indexOf("Too few lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
+							error += "Too few lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
+						}
+					}
+
+
+
+				}
+
+				//if errors exist, show div and display errors, else hide it
+				if(error != ""){
+				$("#errorLog").show();
+				$("#errorLog").html(error);
+			}else
+				$("#errorLog").hide();
+
 			});
 
 
@@ -136,6 +326,7 @@
 
 		        	var timeS = $("#startTime").val().split(":");
 		        	var timeE = $("#endTime").val().split(":");
+		        	var valid = true;
 
 
 				    var daySource = new Object();
@@ -155,7 +346,14 @@
 				    	$("#dateMilitaryPressSets").val() == "" || $("#dateSquatsWeight").val() == "" || $("#dateSquatsReps").val() == "" || $("#dateSquatsSets").val() == "" || $("#dateDeadliftsWeight").val() == "" || $("#dateDeadliftsReps").val() == "" || $("#dateDeadliftsSets").val() == "" || 
 				    	$("#dateRomanianDeadliftsWeight").val() == "" || $("#dateRomanianDeadliftsReps").val() == "" || $("#dateRomanianDeadliftsSets").val() == ""){
 				    	alert("All fields must be filled out!");
-				    }else{
+				      	valid = false;
+				    }
+				    if(timeE[0] < timeS[0]){
+				    	alert("Starting time must come before ending time!");
+				    	valid = false;
+				    }
+
+				    if(valid == true){
 				    	$("#calendar").fullCalendar('addEventSource', day);
 	    				$('#calendar').fullCalendar('rerenderEvents');
 
@@ -234,6 +432,7 @@
 		        		month = 11;
 		        	}
 
+		        	var valid = true;
 		        	var timeS = $("#EstartTime").val().split(":");
 		        	var timeE = $("#EendTime").val().split(":");
 
@@ -251,7 +450,14 @@
 				    	$("#EdateMilitaryPressSets").val() == "" || $("#EdateSquatsWeight").val() == "" || $("#EdateSquatsReps").val() == "" || $("#EdateSquatsSets").val() == "" || $("#EdateDeadliftsWeight").val() == "" || $("#EdateDeadliftsReps").val() == "" || $("#EdateDeadliftsSets").val() == "" || 
 				    	$("#EdateRomanianDeadliftsWeight").val() == "" || $("#EdateRomanianDeadliftsReps").val() == "" || $("#EdateRomanianDeadliftsSets").val() == ""){
 				    	alert("All fields must be filled out!");
-				    }else{
+				    	valid = false;
+				    }
+				    if(timeE[0] < timeS[0]){
+				    	alert("Starting time must come before ending time!");
+				    	valid = false;
+				    }
+
+				    if(valid == true){
 	    				$('#calendar').fullCalendar('rerenderEvents');
 
 	    				var source = $("#calendar").fullCalendar( 'clientEvents' );
@@ -454,69 +660,7 @@
 							$('#p1').hide('fade', 700, function(){
 								$('#p4').show('fade', 700, function(){
 
-									$('#calendar').fullCalendar({
-								    	events: {
-									        url: 'assets/snippets/fitnessPlanSimulator/char.modify.php',
-									        type: 'POST',
-									        data: {
-												'type'		: "eventLoad",
-												'UID'		: charID
-									        },
-									        error: function() {
-									            alert('there was an error while fetching events!');
-									        }
-									    },
-								        header: {
-										left: 'prev,next today',
-										center: 'title',
-										right: 'month,basicWeek,basicDay'
-										},
-										editable: false,
-										dayClick: function(date, allDay, jsEvent, view) {
-
-											console.log(date);
-											dateSelect = date;
-									        $( "#dateDialog" ).dialog( "open" );
-
-
-									    },
-									    eventClick: function(event) {
-									    	console.log(event.title);
-									    	dateEvent = event;
-
-									    	Stime = event.start + "";
-									    	Stime = Stime.split(" ");
-
-									    	Etime = event.end + "";
-									    	Etime = Etime.split(" ");
-
-									    	var desc = event.description.split(',');
-
-						    				$("#EstartTime").val(Stime[4]);
-						    				$("#EendTime").val(Etime[4]);
-						    				$("#EdateBenchPressWeight").val(desc[0]);
-						    				$("#EdateBenchPressReps").val(desc[1]);
-						    				$("#EdateBenchPressSets").val(desc[2]);
-						    				$("#EdateMilitaryPressWeight").val(desc[3]);
-						    				$("#EdateMilitaryPressReps").val(desc[4]);
-									    	$("#EdateMilitaryPressSets").val(desc[5]);
-						    				$("#EdateSquatsWeight").val(desc[6]);
-						    				$("#EdateSquatsReps").val(desc[7]);
-						    				$("#EdateSquatsSets").val(desc[8]);
-						    				$("#EdateDeadliftsWeight").val(desc[9]);
-						    				$("#EdateDeadliftsReps").val(desc[10]);
-						    				$("#EdateDeadliftsSets").val(desc[11]);
-									    	$("#EdateRomanianDeadliftsWeight").val(desc[12]);
-						    				$("#EdateRomanianDeadliftsReps").val(desc[13]);
-						    				$("#EdateRomanianDeadliftsSets").val(desc[14]);
-
-											$( "#eventDialog" ).dialog( "open" );
-										}
-
-								    });
-
-
-									$('#calendar').fullCalendar('render');
+									loadCalendar();
 
 
 								});
@@ -556,7 +700,7 @@
 			     url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 			     data: dataObject,
 			     success: function(ndata) {
-			     	console.log("charID: " + ndata);
+			     	//console.log("charID: " + ndata);
 
 			     	//track charID
 			     	charID = ndata;
@@ -628,7 +772,7 @@
 		    url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 		    data: dataObject,
 		    success: function(ldata) {
-		     	console.log(ldata);
+		     	//console.log(ldata);
 
 		     
 		    },
@@ -663,7 +807,7 @@
 			delete sourceObj[i].className;
 			
 		}
-		console.log(sourceObj);
+		//console.log(sourceObj);
 
 		sourceString = JSON.stringify(sourceObj);
 
@@ -672,15 +816,15 @@
 			'UID'		: charID,
 			'source'	: sourceString
 		}
-		console.log(dataObject);
+		//console.log(dataObject);
 
 		$.ajax({
 			type: "POST",
 		    url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
 		    data: dataObject,
 		    success: function(ndata) {
-		     	console.log("successfully written");
-		     	console.log(ndata);
+		     	//console.log("successfully written");
+		     	//console.log(ndata);
 		     	$('#calendar').fullCalendar('removeEvents');
 		     	$('#calendar').fullCalendar('refetchEvents');
 	    		$('#calendar').fullCalendar('rerenderEvents');
@@ -773,16 +917,13 @@
         header: {
 		left: 'prev,next today',
 		center: 'title',
-		right: 'month,basicWeek,basicDay'
+		right: 'month'
 		},
 		editable: false,
 		dayClick: function(date, allDay, jsEvent, view) {
-
 			console.log(date);
 			dateSelect = date;
 	        $( "#dateDialog" ).dialog( "open" );
-
-
 	    },
 	    eventClick: function(event) {
 	    	console.log(event.title);
@@ -818,8 +959,6 @@
 		}
 
     });
-
-
 	$('#calendar').fullCalendar('render');
 	}
 
@@ -987,7 +1126,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Bench Press&nbsp;</strong><span class="toolTip" id="benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Bench Press&nbsp;</strong><span class="toolTip benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="personalAssessmentInput" id="benchPress">
@@ -998,7 +1137,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Military Press&nbsp;</strong><span class="toolTip" id="militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
+					<strong>Military Press&nbsp;</strong><span class="toolTip militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
 				</td>
 				<td>
 					<input type="text" class="personalAssessmentInput" id="militaryPress">
@@ -1009,7 +1148,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Squats&nbsp;</strong><span class="toolTip" id="squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
+					<strong>Squats&nbsp;</strong><span class="toolTip squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
 						The exercise starts by moving the hips back and bending the knees and hips to lower the torso and accompanying weight, then returning to the upright position.">?</span>:
 				</td>
 				<td>
@@ -1021,7 +1160,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Deadlifts&nbsp;</strong><span class="toolTip" id="deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
+					<strong>Deadlifts&nbsp;</strong><span class="toolTip deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
 				</td>
 				<td>
 					<input type="text" class="personalAssessmentInput" id="deadlifts">
@@ -1032,7 +1171,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip" id="romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="personalAssessmentInput" id="romanianDeadlifts">
@@ -1049,6 +1188,10 @@
 	</div>
 
 	<div id="p4" style="display:none;">
+
+		Choose three days for each week to workout. Weeks should be alternated between two upper body days and two lower body days. For example, in the first week, upper body is worked Monday and Friday, the next week upper body should only be worked on Wednesday. 
+		You do not want to work both upper and lower body on the same day. Hover over the question marks for tooltips on the exercise terms.<br /> <br /><br /> <br />
+
 		
 		<div id='calendar'></div>
 
@@ -1065,7 +1208,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Bench Press&nbsp;</strong><span class="toolTip" id="benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Bench Press&nbsp;</strong><span class="toolTip benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="dateBenchPressWeight">
@@ -1079,7 +1222,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Military Press&nbsp;</strong><span class="toolTip" id="militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
+					<strong>Military Press&nbsp;</strong><span class="toolTip militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="dateMilitaryPressWeight">
@@ -1093,7 +1236,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Squats&nbsp;</strong><span class="toolTip" id="squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
+					<strong>Squats&nbsp;</strong><span class="toolTip squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
 						The exercise starts by moving the hips back and bending the knees and hips to lower the torso and accompanying weight, then returning to the upright position.">?</span>:
 				</td>
 				<td>
@@ -1108,7 +1251,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Deadlifts&nbsp;</strong><span class="toolTip" id="deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
+					<strong>Deadlifts&nbsp;</strong><span class="toolTip deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="dateDeadliftsWeight">
@@ -1122,7 +1265,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip" id="romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="dateRomanianDeadliftsWeight">
@@ -1148,7 +1291,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Bench Press&nbsp;</strong><span class="toolTip" id="benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Bench Press&nbsp;</strong><span class="toolTip benchTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="EdateBenchPressWeight">
@@ -1162,7 +1305,7 @@
 			</tr>
 			<tr>
 				<td>
-					<strong>Military Press&nbsp;</strong><span class="toolTip" id="militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
+					<strong>Military Press&nbsp;</strong><span class="toolTip militaryTip" title="A weightlifting exercise in which the barbell is lifted to shoulder height and then lifted overhead">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="EdateMilitaryPressWeight">
@@ -1176,7 +1319,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Squats&nbsp;</strong><span class="toolTip" id="squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
+					<strong>Squats&nbsp;</strong><span class="toolTip squatTip" title="A weightlifting exercise in which a lifter holds a bar braced across the trapezius or rear deltoid muscle in the upper back. 
 						The exercise starts by moving the hips back and bending the knees and hips to lower the torso and accompanying weight, then returning to the upright position.">?</span>:
 				</td>
 				<td>
@@ -1191,7 +1334,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Deadlifts&nbsp;</strong><span class="toolTip" id="deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
+					<strong>Deadlifts&nbsp;</strong><span class="toolTip deadliftTip" title="A weightlifting exercise in which a barbell is lifted off the ground from a stabilized, bent over position">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="EdateDeadliftsWeight">
@@ -1205,7 +1348,7 @@
 			</tr>		
 			<tr>
 				<td>
-					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip" id="romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
+					<strong>Romanian Deadlifts&nbsp;</strong><span class="toolTip romDeadliftTip" title="A weightlifting exercise in which a lifter lies on a bench with feet on the floor and raises a weight with both arms.">?</span>:
 				</td>
 				<td>
 					<input type="text" class="dateExInput" id="EdateRomanianDeadliftsWeight">
@@ -1220,7 +1363,9 @@
 		</table>
 		</div>
 
-	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green next">Next ></a></div>
+		<div id="errorLog"></div>
+
+	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green sim">Simulate</a></div>
 	</div>
 
 <!--END WRAPPER-->

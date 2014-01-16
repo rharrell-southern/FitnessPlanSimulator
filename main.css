@@ -9,6 +9,7 @@ body{
 
 #wrapper{
 	width: 900px;
+    height: 100%;
 	margin:0px auto;
 	background-color:#f0ead2;
 	padding:35px;
@@ -71,6 +72,19 @@ body{
     background-color: #EEE;
 }
 
+#errorLog {
+    font-size: 10px;
+    font-weight: bold;
+    color: #A00000;
+    background-color: #C1C6C9;
+    padding: 5px;
+    text-align: center;
+    border-width: 1px;
+    border-color: #FFF;
+    border-style: dotted;
+    display:none;
+}
+
 .toolTip{
     font-style:italic;
     font-size:10px;
@@ -83,7 +97,7 @@ body{
 
 }
 
-#buttons .next{
+#buttons .next, .sim{
     float: right;
 }
 
