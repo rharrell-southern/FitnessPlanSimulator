@@ -110,7 +110,7 @@
 
 				console.log("new src: ", monthSrc);
 
-				var error = "";
+				var statusLog = "";
 
 				for($i = 0; $i<monthSrc.length; $i++){
 
@@ -118,22 +118,38 @@
 					console.log("I CYCLE: " + $i);
 					console.log("------------");
 
-						//get our limits (sunday, friday, next friday)
+						//get our limits (sunday, sat, next sat)
+
+						//get first sunday
 						console.log("Date: " + monthSrc[$i].start);
 						var initialDate = monthSrc[$i].start;
 						closestPrevSunday = initialDate.getDay();
 						var sundayDate = new Date(initialDate.toISOString());
 						sundayDate.setDate(sundayDate.getDate() - closestPrevSunday);
 
+						//get saturday
 						var dateOneWeek = new Date(initialDate.toISOString());
-						closestFriday = dateOneWeek.getDay();
-						dateOneWeek.setDate(dateOneWeek.getDate() + (6 - closestFriday));
+						closestSat = dateOneWeek.getDay();
+						dateOneWeek.setDate(dateOneWeek.getDate() + (6 - closestSat));
 
+						//get next saturday
 						var dateTwoWeek = new Date(sundayDate.toISOString());
 						dateTwoWeek.setDate(dateTwoWeek.getDate() + 13);
 
-						var dateTwoWeekS = new Date(sundayDate.toISOString());
-						dateTwoWeekS.setDate(dateTwoWeekS.getDate() + 14);
+						//first sunday for statuslog use
+						var selSun = sundayDate + "";
+
+						//second sunday for statuslog use
+						var sel2Sun = new Date(sundayDate.toISOString());
+						sel2Sun.setDate(sel2Sun.getDate() + 7);
+
+						sel2Sun = sel2Sun + "";
+
+						selSun = selSun.split(" ");
+						sel2Sun = sel2Sun.split(" ");
+
+						selSun = selSun[0] + " " + selSun[1] + " " + selSun[2] + " " + selSun[3];
+						sel2Sun = sel2Sun[0] + " " + sel2Sun[1] + " " + sel2Sun[2] + " " + sel2Sun[3];
 
 						
 						console.log("Range: " + sundayDate + " - " + dateOneWeek + " - " + dateTwoWeek);
@@ -148,39 +164,45 @@
 						for($j = 0; $j<monthSrc.length; $j++){
 						
 							var tmpDate = monthSrc[$j].start;
-							//console.log("(J) trying: " + tmpDate);
+							console.log("(J) trying: " + tmpDate);
 
-							//First week
+							//First sunday to saturday
 							if(tmpDate >= sundayDate && tmpDate <= dateOneWeek){
 								counterW1++;
 								lastAccepted = $j;
-								//console.log("ACCEPTED");
-								//console.log("counterW1: " + counterW1);
+								console.log("ACCEPTED W1");
+								console.log("counterW1: " + counterW1);
 								
 								var excer = monthSrc[$j].description.split(",");
 								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
+									ubCountW1++;
+								}
+
+								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
 									lbCountW1++;
 								}
 
-								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
-									ubCountW1++;
-								}	
+								console.log("counterUBW1: " + ubCountW1);
+								console.log("counterLBW1: " + lbCountW1);		
 							}
 
-							//Next week
+							//Past this saturday, before or equal to next saturday
 							if(tmpDate > dateOneWeek && tmpDate <= dateTwoWeek){
 								counterW2++;
 								lastAccepted = $j;
-								//console.log("ACCEPTED");
-								//console.log("counterW2: " + counterW2);
+								console.log("ACCEPTED W2");
+								console.log("counterW2: " + counterW2);
 								
 								var excer = monthSrc[$j].description.split(",");
 								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
-									lbCountW2++;
-								}
-								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
 									ubCountW2++;
 								}
+								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
+									lbCountW2++;
+								}
+
+								console.log("counterUBW2: " + ubCountW2);
+								console.log("counterLBW2: " + lbCountW2);	
 								
 							}
 					}
@@ -190,74 +212,101 @@
 					console.log("UBW1: " + ubCountW1);
 					console.log("UBW2: " + ubCountW2);
 
+					//console.log("selSun: " + selSun + "AND sel2Sun: " + sel2Sun);
+
 					//make sure 3 workouts per week
 					if(counterW1 > 3){
+						if(statusLog.indexOf("Too many workout periods( " + counterW1 + " ) within the week of " + selSun + "<br /><br/>") == -1){
+							statusLog += "Too many workout periods( " + counterW1 + " ) within the week of " + selSun + "<br /><br/>";
+							console.log(statusLog);
+						}
+					}else if(counterW2 > 3){
+						if(statusLog.indexOf("Too many workout periods( " + counterW2 + " ) within the week of " + sel2Sun + "<br /><br/>") == -1){
+							statusLog += "Too many workout periods( " + counterW2 + " ) within the week of " + sel2Sun + "<br /><br/>";
+							console.log(statusLog);
+						}
+					}else if(ubCountW1 == 2 && lbCountW1 == 1){//THIS WEEK: 2UP 1LOW
+						if(ubCountW2 == 2 && lbCountW2 == 1){//NEXT WEEK: 1UP 2LOW REPEATED
+							if(statusLog.indexOf("Distribution repeated within the week of " + selSun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Distribution repeated within the week of " + selSun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 > 1 && lbCountW2 <= 2){//NEXT WEEK: >1UP 2LOW
+							if(statusLog.indexOf("Too many upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 < 1 && lbCountW2 == 2){//NEXT WEEK: <1UP 2LOW
+							if(statusLog.indexOf("Too few upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too few upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 == 1 && lbCountW2 > 2){//NEXT WEEK: 1UP >2LOW
+							if(statusLog.indexOf("Too many lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 == 1 && lbCountW2 < 2){//NEXT WEEK: 1UP <2LOW
+							if(statusLog.indexOf("Too few lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too few lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 > 2 && lbCountW2 > 2){//NEXT WEEK: <1UP 2LOW
+							if(statusLog.indexOf("Too many upper and lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many upper and lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}
+					}else if(ubCountW1 == 1 && lbCountW1 == 2){//THIS WEEK: 1UP 2LOW
+						if(ubCountW2 == 1 && lbCountW2 == 2){//NEXT WEEK: 1UP 2LOW REPEATED
+							if(statusLog.indexOf("Distribution repeated within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Distribution repeated within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 > 2 && lbCountW2 <= 1){//NEXT WEEK: >1UP 2LOW
+							if(statusLog.indexOf("Too many upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 < 2 && lbCountW2 == 1){//NEXT WEEK: <1UP 2LOW
+							if(statusLog.indexOf("Too few upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too few upper body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 == 2 && lbCountW2 > 1){//NEXT WEEK: 1UP >2LOW
+							if(statusLog.indexOf("Too many lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 == 2 && lbCountW2 < 1){//NEXT WEEK: 1UP <2LOW
+							if(statusLog.indexOf("Too few lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too few lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}else if(ubCountW2 > 2 && lbCountW2 > 2){//NEXT WEEK: <1UP 2LOW
+							if(statusLog.indexOf("Too many upper and lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>") == -1){
+								statusLog += "Too many upper and lower body days within the week of " + sel2Sun + " compared to the surrounding weeks<br /><br/>";
+							}
+						}
+					}else if(ubCountW1 >= 2 && lbCountW1 >= 2){//THIS WEEK: >=2UP AND >=2 LOW
 
-						if(error.indexOf("Too many workout periods( " + counterW1 + " ) within the week of " + sundayDate + "<br /><br/>") == -1){
-						error += "Too many workout periods( " + counterW1 + " ) within the week of " + sundayDate + "<br /><br/>";
-						console.log(error);
-					}
-						var tmp = monthSrc[lastAccepted].start + "";
-						tmp = tmp.split(" ");
-						var cellDate = tmp[3] + "-" + tmp[1] + "-" + tmp[2];
-						console.log(cellDate);
-					}
+						if(statusLog.indexOf("Too many upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>") == -1){
+							statusLog += "Too many upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>";
+						}
 
-					if(counterW2 > 3){
-						if(error.indexOf("Too many workout periods( " + counterW2 + " ) within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
-							error += "Too many workout periods( " + counterW2 + " ) within the week of " + dateTwoWeekS + "<br /><br/>";
-							console.log(error);
+					}else if(ubCountW1 <= 1 && lbCountW1 <= 2){//THIS WEEK: <=1UP AND <=1 LOW
+
+						if(statusLog.indexOf("Too few upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>") == -1){
+							statusLog += "Too few upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>";
+						}
+					}else if(ubCountW1 <= 2 && lbCountW1 <= 1){//THIS WEEK: <=1UP AND <=1 LOW
+
+						if(statusLog.indexOf("Too few upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>") == -1){
+							statusLog += "Too few upper and lower body days within the week of " + selSun + " compared to the surrounding weeks<br /><br/>";
 						}
 					}
-
-					//make sure there is not more than two for one or each type
-					if((lbCountW1 > 1 && ubCountW1 > 1) && (lbCountW2 > 1 && ubCountW2 > 1)){
-						if(error.indexOf("Too many upper and lower body days within the week of " + sundayDate + " and " + dateTwoWeekS + "<br /><br/>") == -1){
-							error += "Too many upper and lower body days within the week of " + sundayDate + " and " + dateTwoWeekS + "<br /><br/>";
-						}
-
-					}else if(lbCountW1 > 1 && ubCountW1 > 1){
-						if(error.indexOf("Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
-							error += "Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
-						}
-
-					}else if(lbCountW2 > 1 && ubCountW2 > 1){
-						if(error.indexOf("Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
-							error += "Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>";
-						}
-					}
-
-					if (lbCountW1 > 1 && lbCountW2 > 1){
-						if(error.indexOf("Too many lower body days within the week of " + dateTwoWeekS + "<br /><br/>") == -1){
-							error += "Too many lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
-						}
-
-					}else if(ubCountW1 > 1 && ubCountW2 > 1){
-						if(error.indexOf("Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
-							error += "Too many upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
-						}
-					}else if(ubCountW1 <= 1 && ubCountW2 <= 1){
-						if(error.indexOf("Too few upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
-							error += "Too few upper body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
-						}
-					}else if(lbCountW1 <= 1 && lbCountW2 <= 1){
-						if(error.indexOf("Too few lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>") == -1){
-							error += "Too few lower body days within the week of " + sundayDate + " compared to the surrounding weeks<br /><br/>";
-						}
-					}
-
-
-
 				}
 
 				//if errors exist, show div and display errors, else hide it
-				if(error != ""){
-				$("#errorLog").show();
-				$("#errorLog").html(error);
-			}else
-				$("#errorLog").hide();
-
-			});
+				if(statusLog != ""){
+				$("#statusLog").show();
+				$("#statusLog").html(statusLog);
+				console.log(statusLog);
+			}else{
+				$("#statusLog").show();
+				$("#statusLog").html("<p style='color:green';> Good distribution throughout this month!</p>");
+				console.log("SL: " + statusLog);
+			}				
+		});
 
 
 			//page navs
@@ -1363,7 +1412,7 @@
 		</table>
 		</div>
 
-		<div id="errorLog"></div>
+		<div id="statusLog"></div>
 
 	<div id="buttons" class="sel"><a href="#" class="pButton green prev">< Previous</a> <a href="#" class="pButton green sim">Simulate</a></div>
 	</div>
