@@ -701,15 +701,17 @@
 							$("#"+activity).hide();
 						}
 
-		        	//track selected ID
-		        	charID = $("input[name=character]:checked", "#loadDialog").val();
-		        	//console.log(charID);
 
-		        	//get the activity related to selected charID (which will be the next span of class "act")
-		        	activity = $("input[name=character]:checked", "#loadDialog").nextAll("span.act:first").text();
+		        	//track selected ID and activity
+					var idAct = $("input[name=character]:checked", "#loadDialog").val();
+					idAct = idAct.split(",");
+		        	charID = idAct[0];
+
+		        	activity = idAct[1];
+
 		        	//print selected data
-		        	//console.log("Selected charID: " + charID);
-		        	//console.log("Selected Activity: " + activity);
+		        	console.log("Selected charID: " + charID);
+		        	console.log("Selected Activity: " + activity);
 
 		        	//ensure user has selected a profile
 		        	if(charID != null){
@@ -746,7 +748,7 @@
 				     data: dataObject,
 				     dataType: 'json',
 				     success: function(ndata) {
-				     	//console.log("Data: " + ndata);
+				     	console.log("Data: ", ndata);
 
 				     	/*$.each(ndata.Entries, function (){
 							console.log(this.id + " " + this.date);
@@ -775,6 +777,7 @@
 						} else {
 							$('#p1').hide('fade', 700, function(){
 								$('#p2').show('fade', 700, function(){
+
 								});
 							});
 						}
@@ -882,8 +885,8 @@
 		     	$.each(ldata, function (){
 
 		     		$("#loadDialog").append(
-		     			"<div class='radiowrapper'><input type='radio' name='character' id='" + this.id + "' value='" + this.id + "'> <label for='" + this.id + "'><b>Username:</b> " + this.username + "<br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Gender:</b> "
-		     			+ this.gender + "<button type='button' style='float: right;' onclick='deleteChar("+ this.id + ")'>Delete</button><br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Activity:</b> <span class='act'>" + this.activity+ "</span><br /><br /> </label></div>" 
+		     			"<input type='radio' name='character' id='" + this.id + "' value='" + this.id + "," + this.activity + "'> <label for='" + this.id + "' class='radioWrapper'><b>Username:</b> " + this.username + "<br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Gender:</b> "
+		     			+ this.gender + "<button type='button' style='float: right;' onclick='deleteChar("+ this.id + ")'>Delete</button><br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Activity:</b> " + this.activity+ "<br /><br /> </label>" 
 		     			);
 
 		     	})
@@ -1017,7 +1020,7 @@
 		if (object.hasClass('prev')){
 			navTo = current - 1;
 		}
-		//console.log('Current: ' + current + ' - Nav To: ' + navTo);
+		console.log('Current: ' + current + ' - Nav To: ' + navTo);
 		$('#p'+current).hide('fade', 700, function(){
 			$('#p'+ navTo).show('fade', 700, function(){
 				console.log(navTo);
@@ -1330,8 +1333,12 @@
 
 	<div id="p4" style="display:none;">
 
-		Choose three days for each week to workout. Weeks should be alternated between two upper body days and two lower body days. For example, in the first week, upper body is worked Monday and Friday, the next week upper body should only be worked on Wednesday. 
-		You do not want to work both upper and lower body on the same day. Hover over the question marks for tooltips on the exercise terms.<br /> <br /><br /> <br />
+		Scheduling Routines:
+		<ul>
+			<li>Choose three days for each week to workout.</li>
+			<li>Weeks should be alternated between two upper body days and two lower body days. (i.e.: Work Upper body on Mon/Fri, and lower body on Wed. Flip for the following week)</li>
+			<li>Hover over question marks in the popup windows for tooltips on the exercise terms, click for a more in-depth description.</li>
+		</ul><br /> <br /><br /> <br />
 
 		
 		<div id='calendar'></div>
