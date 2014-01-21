@@ -106,9 +106,14 @@
 					}
 				}
 
+				monthSrc.sort(function(a, b){
+				 var dateA=new Date(a.start), dateB=new Date(b.start)
+				 return dateA-dateB //sort by date ascending
+				});
+
 				//array formed, now perform logic checks
 
-				console.log("new src: ", monthSrc);
+				console.log("Sorted src: ", monthSrc);
 
 				var statusLog = "";
 
@@ -173,13 +178,63 @@
 								console.log("ACCEPTED W1");
 								console.log("counterW1: " + counterW1);
 								
+								//current exer data
 								var excer = monthSrc[$j].description.split(",");
+
+								//next/prev data
+								var excer2;
+								var excer0;
+
+								var next = $j + 1;
+								var prev = $j - 1;
+
+
 								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
 									ubCountW1++;
+
+
+
+									//if previous isn't one before the first item, and next isn't one before the last item
+									if(next >= 0 && next < monthSrc.length){
+										//next excer data
+										var excer2 = monthSrc[next].description.split(",");
+
+										if(excer2[0] > 0 && excer2[1] > 0 && excer2[2] > 0 && excer2[3] > 0 && excer2[4] > 0 && excer2[5] > 0){
+
+											var day = monthSrc[next].start + " ";
+											day = day.split(" ");
+											day = day[0] + " " + day[1] + " " + day[2] + " " + day[3];
+
+											if(statusLog.indexOf("Two or more sequential upper body exercise days starting on " + day + "<br /><br/>") == -1){
+												statusLog += "Two or more sequential upper body exercise days starting on " + day + "<br /><br/>";
+												console.log(statusLog);
+											}
+
+										}
+									}
 								}
 
 								if(excer[6] > 0 && excer[7] > 0 && excer[8] > 0 && excer[9] > 0 && excer[10] > 0 && excer[11] > 0 && excer[12] > 0 && excer[13] > 0 && excer[14] > 0){
 									lbCountW1++;
+									
+									//if previous isn't one before the first item, and next isn't one before the last item
+									if(next >= 0 && next < monthSrc.length){
+										//next excer data
+										var excer2 = monthSrc[next].description.split(",");
+
+										if(excer2[6] > 0 && excer2[7] > 0 && excer2[8] > 0 && excer2[9] > 0 && excer2[10] > 0 && excer2[11] > 0 && excer2[12] > 0 && excer2[13] > 0 && excer2[14] > 0){
+
+											var day = monthSrc[next].start + " ";
+											day = day.split(" ");
+											day = day[0] + " " + day[1] + " " + day[2] + " " + day[3];
+
+											if(statusLog.indexOf("Two or more sequential lower body exercise days starting on " + day + "<br /><br/>") == -1){
+												statusLog += "Two or more sequential lower body exercise days starting on " + day + "<br /><br/>";
+												console.log(statusLog);
+											}
+
+										}
+									}
 								}
 
 								console.log("counterUBW1: " + ubCountW1);
@@ -193,7 +248,9 @@
 								console.log("ACCEPTED W2");
 								console.log("counterW2: " + counterW2);
 								
+								//current excer data
 								var excer = monthSrc[$j].description.split(",");
+
 								if(excer[0] > 0 && excer[1] > 0 && excer[2] > 0 && excer[3] > 0 && excer[4] > 0 && excer[5] > 0){
 									ubCountW2++;
 								}
@@ -771,6 +828,41 @@
 
 		}
 
+	function deleteChar(id){
+			if (confirm('Are you sure you want to delete this profile?')) {
+			//log id to delete
+			console.log("Deleting ID#" + id);
+
+			var dataObject = {
+				'type': "delete",
+				'ID': id,
+			}
+
+			$.ajax({
+			type: "POST",
+			     url: "assets/snippets/fitnessPlanSimulator/char.modify.php",
+			     data: dataObject,
+			     success: function(ndata) {
+			     	console.log("Profile ID" + id + " deleted successfully");
+
+			     	//refresh char data
+			     	$("#loadDialog").html("");
+			     	loadChar();
+			     },
+			     error: function(xhr, textStatus, error){
+			     	//alert user, reset vars, update status div
+			     	alert("error in POST")
+			     	$("#charLoad").html("profile deletion failed. . .")
+			     	console.log("xhr.statusText: " + xhr.statusText);
+			     	console.log("textStatus: " + textStatus);
+			     	console.log("error: " + error);
+			     	isLoaded = false;
+			     }
+			 });
+		}
+
+	}
+
 	//load profile from db
 	function loadChar(){
 		var dataObject = {
@@ -790,8 +882,8 @@
 		     	$.each(ldata, function (){
 
 		     		$("#loadDialog").append(
-		     			"<input type='radio' name='character' value='" + this.id + "'> <b>Username:</b> " + this.username + "<br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Gender:</b> "
-		     			+ this.gender + "<br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Activity:</b> <span class='act'>" + this.activity+ "</span><br /> <br />" 
+		     			"<div class='radiowrapper'><input type='radio' name='character' id='" + this.id + "' value='" + this.id + "'> <label for='" + this.id + "'><b>Username:</b> " + this.username + "<br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Gender:</b> "
+		     			+ this.gender + "<button type='button' style='float: right;' onclick='deleteChar("+ this.id + ")'>Delete</button><br />&nbsp;&nbsp;&nbsp;&nbsp; <b>Activity:</b> <span class='act'>" + this.activity+ "</span><br /><br /> </label></div>" 
 		     			);
 
 		     	})

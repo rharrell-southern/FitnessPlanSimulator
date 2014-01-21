@@ -149,8 +149,14 @@ if($_POST["type"] == "new"){
 	);
 	$modx->db->insert($fields, 'fp_users');
 
-}else if($_POST["type"] == "remove"){
-	//TODO: write
+}else if($_POST["type"] == "delete"){
+	//delete profile data from fp_users and fp_data
+
+	$table0 = "fp_users";
+	$table1 = "fp_data";
+
+	$modx->db->delete($table0, 'ID = "' . $_POST["ID"] . '"');
+	$modx->db->delete($table1, 'PID = "' . $_POST["ID"] . '"');
 
 }else if($_POST["type"] == "load"){
 	//define table
