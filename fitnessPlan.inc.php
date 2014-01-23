@@ -1035,7 +1035,9 @@
 					$('#header').html("Personal Assessment");
 					break;
 				case 4:
-					loadCalendar();
+					if ( $('#calendar').children().length <= 0 ) {
+						loadCalendar();
+					}
 					break;
 				default:
 					$('#header').html("Southern's fitness plan simulator");
@@ -1337,6 +1339,7 @@
 		<ul>
 			<li>Choose three days for each week to workout.</li>
 			<li>Weeks should be alternated between two upper body days and two lower body days. (i.e.: Work Upper body on Mon/Fri, and lower body on Wed. Flip for the following week)</li>
+			<li>To add a workout day, click on any cell in the calendar below. A pop-up window will appear, with fields to enter in information such as time/weight/etc.
 			<li>Hover over question marks in the popup windows for tooltips on the exercise terms, click for a more in-depth description.</li>
 		</ul><br /> <br /><br /> <br />
 
