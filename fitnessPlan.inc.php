@@ -377,11 +377,17 @@
 					}
 				}else if(($(this).parent().parent().attr("id")) == "p3"){
 					//if on p3, check for all inputs before submitting to database
+					//if not empty
 					if($("#benchPress").val() !="" && $("#militaryPress").val() !="" && $("#squats").val() !="" && $("#deadlifts").val() !="" && $("#romanianDeadlifts").val() !=""){
-						submitAssessment($("#benchPress").val(), $("#militaryPress").val(), $("#squats").val(), $("#deadlifts").val(), $("#romanianDeadlifts").val());
-						go($(this));
+						//if numbers
+						if((isNaN($("#benchPress").val() / 1) == false) && (isNaN($("#militaryPress").val() / 1) == false) && (isNaN($("#squats").val() / 1) == false) && (isNaN($("#deadlifts").val() / 1) == false) && (isNaN($("#romanianDeadlifts").val() / 1) == false)){
+							submitAssessment($("#benchPress").val(), $("#militaryPress").val(), $("#squats").val(), $("#deadlifts").val(), $("#romanianDeadlifts").val());
+							go($(this));
+						}else{
+							alert("Please enter a number value for each exercise!")
+						}
 					}else{
-						alert("Please enter a value for each exercise!")
+						alert("Please enter a number value for each exercise!")
 					}
 				}else{
 					go($(this));
