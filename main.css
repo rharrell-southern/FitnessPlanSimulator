@@ -13,7 +13,14 @@ margin-right: 10%;
 margin-top: .5em;
 margin-bottom: .5em;
 }
-
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #184F2C;
+}
+a:hover {
+    border-bottom:1px dashed;
+}
 #wrapper{
 	width: 900px;
     height: 100%;
@@ -31,17 +38,21 @@ margin-bottom: .5em;
     padding-bottom: 7px;
     text-align: center;
 }
+#header{
+    background-image:url(images/hwc_distance.jpg);
+    background-position: 0px -435px;
+    background-repeat: no-repeat;
+    margin:-35px -35px 0px -35px;
+}
 
 .title{
 	font-family: Tahoma, Geneva, sans-serif;
 	font-size: 42px;
-	text-align:center;
-	text-shadow: 0 0 0.2em #043B17;
+	text-align:left;
+	text-shadow: 0 0 10px #000;
 	font-weight: bold;
-	color: #14592c;
-	margin: 0px auto;
-	padding-top: 10px;
-	padding-bottom: 70px;
+	color: #FFF;
+	padding: 90px 35px 10px 35px;
 
 }
 
@@ -83,15 +94,17 @@ margin-bottom: .5em;
     font-size: 10px;
     font-weight: bold;
     color: #A00000;
-    background-color: #C1C6C9;
-    padding: 5px;
-    text-align: center;
+    padding: 25px;
     border-width: 1px;
-    border-color: #FFF;
+    border-color: #CCC;
     border-style: dotted;
     display:none;
+    max-height:150px;
+    overflow: auto;
 }
-
+.ui-progressbar-value {
+    background:transparent;
+}
 .toolTip{
     font-style:italic;
     font-size:10px;
@@ -157,9 +170,29 @@ margin-bottom: .5em;
         inset 0 2px 0 #F3F5BC,
         0 1px 3px #777,
         0 0px 1px #ccc;
-    }
+}
 
 .green span {
     color: #184F2C;
     text-shadow: #E2E681 0 1px 0;
-    }​
+}​
+
+div#ui-datepicker-div.ui-widget-content div.ui-timepicker-div {
+    overflow: auto !important;
+    padding-bottom:15px;
+}
+.ui-timepicker-div dt.ui_tpicker_time_label,
+.ui-timepicker-div dd.ui_tpicker_time {
+    display:none;
+}
+.ui-timepicker-div dt.ui_tpicker_hour_label,
+.ui-timepicker-div dd.ui_tpicker_hour,
+.ui-timepicker-div dt.ui_tpicker_minute_label,
+.ui-timepicker-div dd.ui_tpicker_minute {
+    float:left !important;
+    margin-left:10px;
+}
+.ui-datepicker-buttonpane {
+    clear:both;
+    margin-top:65px !important;
+}

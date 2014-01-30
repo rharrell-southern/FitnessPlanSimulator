@@ -146,7 +146,8 @@ if($_POST["type"] == "new"){
 		'activity'				=> $_POST["activity"],
 		'gender'				=> $_POST["gender"],
 		'personalAssessment'	=> "",
-	);
+		'startMonth'			=> $_POST["startMonth"]
+		);
 	$modx->db->insert($fields, 'fp_users');
 
 }else if($_POST["type"] == "delete"){
@@ -173,7 +174,7 @@ if($_POST["type"] == "new"){
 	   		//Continue printing untill all records displayed
 			while( $row = $modx->db->getRow( $res ) ) {
 
-				$output .= '"character'.$i.'":{ "id":"'.$row['ID'].'","username":"'.$row['username'].'", "gender":"'.$row['gender'].'","activity":"'.$row['activity'].'"}';
+				$output .= '"character'.$i.'":{ "id":"'.$row['ID'].'","username":"'.$row['username'].'", "gender":"'.$row['gender'].'","activity":"'.$row['activity'].'","startMonth":"'.$row['startMonth'].'"}';
 				if ($i < ($totalRecords - 1)) {
 					$output .= ",";
 				}
